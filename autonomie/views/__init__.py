@@ -537,6 +537,10 @@ class BaseFormView(FormView):
         FormView.__init__(self, self.request)
         self.dbsession = self.request.dbsession
         self.session = self.request.session
+        self.dbsession = self.request.dbsession
+
+        FormView.__init__(self, self.request)
+
         self.logger = logging.getLogger("autonomie.views.__init__")
         if self.request.has_permission('manage'):
             tinymce.need()
@@ -762,7 +766,6 @@ class DisableView(BaseView):
             self.request.dbsession.merge(self.context)
             if hasattr(self, "on_disable"):
                 self.on_disable()
-
             if self.disable_msg is not None:
                 self.request.session.flash(self.disable_msg)
         else:

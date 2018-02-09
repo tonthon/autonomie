@@ -37,7 +37,6 @@
 """
 import datetime
 import logging
-import deform
 
 from sqlalchemy import (
     Column,
@@ -53,7 +52,6 @@ from sqlalchemy.orm import (
     relationship,
 )
 from autonomie_base.consts import CIVILITE_OPTIONS as ORIG_CIVILITE_OPTIONS
-from autonomie import forms
 from autonomie.forms.customer import customer_after_bind
 from autonomie_base.models.types import (
     PersistentACLMixin,
@@ -128,7 +126,7 @@ class Customer(DBBASE, PersistentACLMixin):
             default=datetime.date.today,
             info={
                 'export': {'exclude': True},
-                'colanderalchemy': forms.EXCLUDED,
+                'colanderalchemy': {'exclude': True},
             },
             nullable=False,
         ),
@@ -142,7 +140,7 @@ class Customer(DBBASE, PersistentACLMixin):
             onupdate=datetime.date.today,
             info={
                 'export': {'exclude': True},
-                'colanderalchemy': forms.EXCLUDED,
+                'colanderalchemy': {'exclude': True},
             },
             nullable=False,
         ),
@@ -155,7 +153,7 @@ class Customer(DBBASE, PersistentACLMixin):
         ForeignKey('company.id'),
         info={
             'export': {'exclude': True},
-            'colanderalchemy': forms.EXCLUDED,
+            'colanderalchemy': {'exclude': True},
         },
         nullable=False,
     )
@@ -184,10 +182,6 @@ class Customer(DBBASE, PersistentACLMixin):
             info={
                 'colanderalchemy': {
                     'title': u"Civilité",
-                    'widget': forms.get_radio(
-                        CIVILITE_OPTIONS[1:],
-                        inline=True
-                    ),
                 }
             }
         ),
@@ -243,10 +237,6 @@ class Customer(DBBASE, PersistentACLMixin):
             info={
                 'colanderalchemy': {
                     'title': u'Adresse',
-                    'widget': deform.widget.TextAreaWidget(
-                        cols=25,
-                        row=1,
-                    )
                 }
             },
             nullable=False,
@@ -301,7 +291,6 @@ class Customer(DBBASE, PersistentACLMixin):
             info={
                 'colanderalchemy': {
                     'title': u"Adresse de messagerie",
-                    'validator': forms.mail_validator(),
                 },
             },
             default='',
@@ -369,9 +358,6 @@ class Customer(DBBASE, PersistentACLMixin):
             info={
                 'colanderalchemy': {
                     'title': u"Commentaires",
-                    'widget': deform.widget.TextAreaWidget(
-                        css_class="col-md-10"
-                    ),
                 }
             },
         ),
@@ -408,14 +394,14 @@ class Customer(DBBASE, PersistentACLMixin):
     archived = Column(
         Boolean(),
         default=False,
-        info={'colanderalchemy': forms.EXCLUDED},
+        info={'colanderalchemy': {'exclude': True}},
     )
 
     company = relationship(
         "Company",
         primaryjoin="Company.id==Customer.company_id",
         info={
-            'colanderalchemy': forms.EXCLUDED,
+            'colanderalchemy': {'exclude': True},
             'export': {'exclude': True},
         }
     )
@@ -424,7 +410,7 @@ class Customer(DBBASE, PersistentACLMixin):
         "Estimation",
         primaryjoin="Estimation.customer_id==Customer.id",
         info={
-            'colanderalchemy': forms.EXCLUDED,
+            'colanderalchemy': {'exclude': True},
             'export': {'exclude': True},
         }
 
@@ -434,7 +420,7 @@ class Customer(DBBASE, PersistentACLMixin):
         "Invoice",
         primaryjoin="Invoice.customer_id==Customer.id",
         info={
-            'colanderalchemy': forms.EXCLUDED,
+            'colanderalchemy': {'exclude': True},
             'export': {'exclude': True},
         }
 
@@ -444,7 +430,7 @@ class Customer(DBBASE, PersistentACLMixin):
         "CancelInvoice",
         primaryjoin="CancelInvoice.customer_id==Customer.id",
         info={
-            'colanderalchemy': forms.EXCLUDED,
+            'colanderalchemy': {'exclude': True},
             'export': {'exclude': True},
         }
 

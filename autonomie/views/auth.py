@@ -46,8 +46,9 @@ from deform import ValidationFailure
 
 from js.bootstrap import bootstrap
 
+from autonomie.models.user.login import Login
 from autonomie.views import BaseView
-from autonomie.forms.user import (
+from autonomie.forms.user.login import (
     get_auth_schema,
     get_json_auth_schema,
 )
@@ -126,16 +127,13 @@ def api_login_post_view(request):
     """
     schema = get_json_auth_schema()
     appstruct = request.json_body
-    log.info(u"Authenticating : '{0}'".format(appstruct.get('login')))
     try:
         appstruct = schema.deserialize(appstruct)
     except colander.Invalid, err:
         log.exception("  - Erreur")
         raise RestError(err.asdict(), 400)
     else:
-        login = appstruct['login']
-        log.info(u" + '{0}' has been authenticated".format(login))
-        remember(request, login)
+        connect_user(request, appstruct)
     return Apiv1Resp(request)
 
 
@@ -205,7 +203,12 @@ def connect_user(request, form_datas):
     :pram dict form_datas: Validated form_datas
     """
     login = form_datas['login']
-    log.info(u" + '{0}' has been authenticated".format(login))
+    login_id = Login.id_from_login(login)
+    log.info(
+        u" + '{0}' id : {1} has been authenticated".format(
+            login, login_id
+        )
+    )
     # Storing the form_datas in the request object
     remember(request, login)
     remember_me = form_datas.get('remember_me', False)
