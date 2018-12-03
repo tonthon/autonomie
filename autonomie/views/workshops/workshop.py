@@ -169,8 +169,7 @@ class WorkshopAddView(BaseFormView):
 
         # Current user by default
         if (
-                self.request.has_permission('edit_owner.event')
-                and
+                self.request.has_permission('edit_owner.event') and
                 appstruct.get('owner')
         ):
             appstruct['owner'] = user.User.get(appstruct['owner'])
@@ -466,7 +465,7 @@ class WorkshopListView(BaseWorkshopListView):
     Workshop listing view
     """
     grid = SEARCH_FORM_GRID
-    title=u"Organisation d'ateliers"
+    title = u"Organisation d'ateliers"
 
     def filter_owner_or_trainer(self, query, appstruct):
         if self.request.has_permission('admin.workshop'):
@@ -603,7 +602,8 @@ class UserWorkshopListView(CompanyWorkshopListView):
     def title(self):
         user = self.context
         return u'Ateliers auxquels {} assiste'.format(
-            'il' if user.userdatas.coordonnees_sex == 'M' else 'elle'
+            'il' if user.userdatas and
+            user.userdatas.coordonnees_sex == 'M' else 'elle'
         )
 
     def filter_participant(self, query, appstruct):
@@ -767,7 +767,6 @@ def workshop_signout_view(workshop, request):
     return HTTPFound(url)
 
 
-
 class WorkShopDuplicateView(DuplicateView):
     """
     Workshop duplication view
@@ -896,7 +895,6 @@ def add_views(config):
         permission='signout.event',
         request_param='action=signout',
     )
-
 
     config.add_view(
         workshop_delete_view,
