@@ -161,6 +161,19 @@ def gen_all_invoices(context, request):
         )
 
 
+def add_invoice_view(context, request):
+    """
+    View used to add an invoice to the current business
+    """
+    invoice = context.add_invoice(request.user)
+    return HTTPFound(
+        request.route_path(
+            "/invoices/{id}",
+            id=invoice.id
+        )
+    )
+
+
 def includeme(config):
     config.add_tree_view(
         BusinessInvoicesListView,
@@ -198,4 +211,11 @@ def includeme(config):
         gen_all_invoices,
         route_name=BUSINESS_ITEM_INVOICING_ALL_ROUTE,
         permission="add.invoice",
+    )
+    config.add_view(
+        add_invoice_view,
+        route_name=BUSINESS_ITEM_INVOICE_ROUTE,
+        permission="add.invoice",
+        request_param="action=add",
+        layout="default"
     )

@@ -206,6 +206,29 @@ class BusinessService:
         return estimation
 
     @classmethod
+    def add_invoice(cls, business, user):
+        """
+        Freely add a new invoice to the current business
+
+        :param obj business: The current business instance this service is
+        attached to
+        :returns: A new Invoice instance
+        """
+        from autonomie.models.task.invoice import Invoice
+        invoice = Invoice(
+            user=user,
+            company=business.project.company,
+            project=business.project,
+            customer_id=cls._get_customer_id(business),
+            business_id=business.id,
+            business_type_id=business.business_type_id,
+        )
+        invoice.initialize_business_datas()
+        DBSESSION().add(invoice)
+        DBSESSION().flush()
+        return invoice
+
+    @classmethod
     def _get_customer_id(cls, business):
         """
         Find the customer associated to this bussiness

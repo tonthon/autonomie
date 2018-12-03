@@ -234,3 +234,12 @@ class Business(Node):
         :rtype: class autonomie.models.task.estimation.Estimation
         """
         return self._autonomie_service.add_estimation(self, user)
+
+    def add_invoice(self, user):
+        """
+        Generate a new invoice attached to the current business
+
+        :param obj user: The user generating the invoice
+        :rtype: class autonomie.models.task.invoice.Invoice
+        """
+        return self._autonomie_service.add_invoice(self, user)
