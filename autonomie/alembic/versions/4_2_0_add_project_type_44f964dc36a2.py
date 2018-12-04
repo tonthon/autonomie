@@ -50,6 +50,10 @@ def update_database_structure():
             "version", sa.Integer,
         )
     )
+    op.add_column(
+        'task',
+        sa.Column('legacy_number', sa.Boolean(), nullable=False)
+    )
 
     for tbl, column in (
         ("task", "name"),
@@ -132,6 +136,26 @@ def _add_business_to_all_invoices(session):
     session.flush()
 
 
+def _add_mentions_to_default_business_type(session, default_btype_id):
+    """
+    migrate existing task mentions to relate them to the default business type
+    """
+    from autonomie.models.task.mentions import TaskMention
+    from autonomie.models.project.mentions import BusinessTypeTaskMention
+
+    ids = session.query(TaskMention.id)
+    for (id_,) in ids:
+        for doctype in ('invoice', 'cancelinvoice', 'estimation'):
+            relation = BusinessTypeTaskMention(
+                task_mention_id=id_,
+                business_type_id=default_btype_id,
+                doctype=doctype
+                mandatory=False,
+            )
+            session.add(relation)
+    session.flush()
+
+
 def migrate_datas():
     from autonomie_base.models.base import DBSESSION
     session = DBSESSION()
@@ -182,6 +206,7 @@ task.business_type_id={btype_id} where task2.business_type_id=4".format(
     op.execute(query)
 
     _add_business_to_all_invoices(session)
+    _add_mentions_to_default_business_type(session, default_btype_id)
 
 
 def clean_database():

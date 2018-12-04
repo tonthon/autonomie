@@ -14,9 +14,14 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 from zope.sqlalchemy import mark_changed
+from autonomie.alembic.utils import column_exists
 
 def update_database_structure():
-    op.add_column('task', sa.Column('legacy_number', sa.Boolean(), nullable=False))
+    if not column_exists('task', 'legacy_number'):
+        op.add_column(
+            'task',
+            sa.Column('legacy_number', sa.Boolean(), nullable=False)
+        )
 
 def migrate_datas():
     """We tolerate duplicate invoice number for invoices issued so far.
